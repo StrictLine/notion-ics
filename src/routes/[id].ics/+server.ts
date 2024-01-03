@@ -18,6 +18,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
 	const { id } = params;
 
+	const calendarDefinition = id in config ? config[id] : config.default;
+
 	const databaseMetadata = await notion.databases.retrieve({ database_id: id });
 
 	const databaseEntries = [];
@@ -30,7 +32,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 			database_id: id,
 			page_size: 100,
 			start_cursor: query.next_cursor,
-			filter: config.filter
+			filter: calendarDefinition.filter
 		});
 		databaseEntries.push(...query.results);
 	}
@@ -39,13 +41,13 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		title: string;
 		date: { start: string; end: string | null; time_zone: string | null };
 	}[] = databaseEntries.flatMap((object) => {
-		if (object.properties[config.dateProperty].date === null) {
+		if (object.properties[calendarDefinition.dateProperty].date === null) {
 			return [];
 		}
 		return [
 			{
-				title: object.properties[config.titleProperty].title[0].text.content,
-				date: object.properties[config.dateProperty].date
+				title: object.properties[calendarDefinition.titleProperty].title[0].text.content,
+				date: object.properties[calendarDefinition.dateProperty].date
 			}
 		];
 	});
@@ -60,7 +62,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
 	const calendar = ical({
 		name: ((databaseMetadata as DatabaseObjectResponse).title[0] as TextRichTextItemResponse).text.content,
-		prodId: { company: 'Tomi Chen', language: 'EN', product: 'notion-ics' }
+		prodId: { company: 'StrictLine e. U.', language: 'EN', product: 'notion-ics' }
 	});
 	filtered.forEach((event) => {
 		calendar.createEvent({
@@ -68,7 +70,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 			end: new Date(Date.parse(event.date.end ?? event.date.start) + 86400000), // end date is exclusive, so add 1 day
 			allDay: true,
 			summary: event.title,
-			busystatus: config.busy
+			busystatus: calendarDefinition.busy
 		});
 	});
 
