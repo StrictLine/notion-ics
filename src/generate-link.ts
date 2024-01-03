@@ -24,7 +24,7 @@ try {
 	const dbKey = path.substring(queryStringIndex + 1);
 
 	console.log(`DB Key: ${dbKey}`);
-	console.log(`ICS URL: ${publicHostUrl}/${dbKey}?secret=${secret}`);
+	console.log(`ICS URL: ${publicHostUrl}/${dbKey}.ics?secret=${secret}`);
 } catch (error) {
 	console.error('Invalid link provided.');
 	process.exit(1);
