@@ -1,6 +1,6 @@
 import ical from 'ical-generator';
 import { Client } from '@notionhq/client';
-import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { DatabaseObjectResponse, QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 
 import config from '$lib/config';
 import { ACCESS_KEY, NOTION_TOKEN } from '$env/static/private';
@@ -50,8 +50,16 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		];
 	});
 
+	if (!('title' in databaseMetadata))
+		return new Response('Partial response has been received from notion', {
+			status: 404,
+			headers: {
+				'content-type': 'text/plain'
+			}
+		});
+
 	const calendar = ical({
-		name: databaseMetadata.title[0].text.content,
+		name: ((databaseMetadata as DatabaseObjectResponse).title[0] as TextRichTextItemResponse).text.content,
 		prodId: { company: 'Tomi Chen', language: 'EN', product: 'notion-ics' }
 	});
 	filtered.forEach((event) => {
