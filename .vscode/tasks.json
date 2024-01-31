@@ -1,0 +1,56 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "docker-build",
+			"label": "docker-build",
+			"platform": "node",
+			"dockerBuild": {
+				"dockerfile": "${workspaceFolder}/Dockerfile",
+				"context": "${workspaceFolder}",
+				"pull": true,
+
+				"buildArgs": {
+					"NOTION_TOKEN": "${env:NOTION_TOKEN}",
+					"ACCESS_KEY": "${env:ACCESS_KEY}"
+				}
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: release",
+			"dependsOn": [
+				"docker-build"
+			],
+			"platform": "node"
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: debug",
+			"dependsOn": [
+				"docker-build"
+			],
+			"dockerRun": {
+				"command": "npm run preview",
+				"env": {
+					"DEBUG": "*",
+					"NODE_ENV": "development",
+
+					"PORT": "5173",
+					"NOTION_TOKEN": "${env:NOTION_TOKEN}",
+					"ACCESS_KEY": "${env:ACCESS_KEY}",
+					"PUBLIC_HOST_URL": "http://127.0.0.1:5173/"
+				},
+				"ports": [
+					{
+						"containerPort": 5173,
+						"hostPort": 5173
+					}
+				]				
+			},
+			"node": {
+				"enableDebugging": true
+			}
+		}
+	]
+}

@@ -1,0 +1,25 @@
+{
+	"configurations": [
+		{
+			"name": "Launch run dev",
+			"request": "launch",
+			"runtimeArgs": [
+				"run",
+				"dev"
+			],
+			"runtimeExecutable": "npm",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "node"
+		},
+		
+		{
+			"name": "Docker Node.js Launch",
+			"type": "docker",
+			"request": "launch",
+			"preLaunchTask": "docker-run: debug",
+			"platform": "node"
+		}
+	]
+}
