@@ -8,12 +8,7 @@
 			"dockerBuild": {
 				"dockerfile": "${workspaceFolder}/Dockerfile",
 				"context": "${workspaceFolder}",
-				"pull": true,
-
-				"buildArgs": {
-					"NOTION_TOKEN": "${env:NOTION_TOKEN}",
-					"ACCESS_KEY": "${env:ACCESS_KEY}"
-				}
+				"pull": true
 			}
 		},
 		{

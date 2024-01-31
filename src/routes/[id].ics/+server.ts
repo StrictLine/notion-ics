@@ -3,9 +3,9 @@ import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 
 import config from '$lib/config';
-import { ACCESS_KEY, NOTION_TOKEN } from '$env/static/private';
 import type { RequestHandler } from './$types';
 
+const { ACCESS_KEY, NOTION_TOKEN } = process.env;
 export const trailingSlash = 'never';
 
 const notion = new Client({ auth: NOTION_TOKEN });
