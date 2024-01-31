@@ -10,3 +10,4 @@ node_modules
 src/lib/config.ts
 docker-compose.yml
 docker-compose.debug.yml
+.vscode/settings.json
