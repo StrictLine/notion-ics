@@ -40,16 +40,46 @@ export const GET: RequestHandler = async ({ params, url }) => {
 	const filtered: {
 		title: string;
 		date: { start: string; end: string | null; time_zone: string | null };
-	}[] = databaseEntries.flatMap((object) => {
-		if (object.properties[calendarDefinition.dateProperty].date === null) {
-			return [];
-		}
-		return [
-			{
-				title: object.properties[calendarDefinition.titleProperty].title[0].text.content,
-				date: object.properties[calendarDefinition.dateProperty].date
+	}[] = databaseEntries.flatMap((dbEntry) => {
+		// console.log(dbEntry)
+		const dateProperty = dbEntry.properties[calendarDefinition.dateProperty];
+		// console.log(dateProperty)
+
+		switch (dateProperty.type) {
+			case 'formula': {
+				if (dateProperty.formula.type !== 'date') {
+					return [];
+				}
+
+				const dateValue = dateProperty.formula.date;
+				if (dateValue === null) {
+					return [];
+				}
+				
+				return [
+					{
+						title: dbEntry.properties[calendarDefinition.titleProperty].title[0].text.content,
+						date: dateValue
+					}
+				];
 			}
-		];
+
+			case 'date':
+				if (dateProperty.date === null) {
+					return [];
+				}
+
+				return [
+					{
+						title: dbEntry.properties[calendarDefinition.titleProperty].title[0].text.content,
+						date: dbEntry.properties[calendarDefinition.dateProperty].date
+					}
+				];						
+		
+			default:
+				break;
+		}
+
 	});
 
 	if (!('title' in databaseMetadata))
