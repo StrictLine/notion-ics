@@ -51,6 +51,12 @@
 			"node": {
 				"enableDebugging": true
 			}
+		},
+		{
+			"type": "npm",
+			"script": "link",
+			"label": "Generate Link from Share link",
+			"problemMatcher": []
 		}
 	]
 }
