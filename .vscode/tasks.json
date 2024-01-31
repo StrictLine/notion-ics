@@ -32,14 +32,14 @@
 			],
 			"dockerRun": {
 				"command": "npm run preview",
+				"envFiles": [
+					"${workspaceFolder}/.env"
+				],
 				"env": {
 					"DEBUG": "*",
 					"NODE_ENV": "development",
 
-					"PORT": "5173",
-					"NOTION_TOKEN": "${env:NOTION_TOKEN}",
-					"ACCESS_KEY": "${env:ACCESS_KEY}",
-					"PUBLIC_HOST_URL": "http://127.0.0.1:5173/"
+					"PORT": "5173"
 				},
 				"ports": [
 					{
