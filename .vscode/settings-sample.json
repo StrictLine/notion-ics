@@ -1,0 +1,4 @@
+{
+	"docker.hubName": "your-docker-hub",
+	"sveltekit.basePath": "/optional-subfolder--can-be-empty"
+}

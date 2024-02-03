@@ -9,7 +9,10 @@
 				"dockerfile": "${workspaceFolder}/Dockerfile",
 				"context": "${workspaceFolder}",
 				"pull": true,
-				"tag": "${config:docker.hubName}/notionics"
+				"tag": "${config:docker.hubName}/notionics",
+				"buildArgs": {
+					"BASE_PATH": "${config:sveltekit.basePath}"
+				}
 			}
 		},
 		{

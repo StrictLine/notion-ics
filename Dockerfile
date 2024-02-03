@@ -1,5 +1,7 @@
 FROM node:lts-alpine
 ENV NODE_ENV=development
+ARG BASE_PATH
+ENV BASE_PATH=${BASE_PATH}
 
 WORKDIR /app
 
