@@ -14,4 +14,4 @@ RUN chown -R node /app
 USER node
 
 EXPOSE 5173
-CMD ["npm", "start"]
+CMD ["npm", "run", "preview"]
