@@ -1,6 +1,7 @@
 import ical from 'ical-generator';
 import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import moment from 'moment';
 
 import config from '$lib/config';
 import type { RequestHandler } from './$types';
@@ -95,10 +96,23 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		prodId: { company: 'StrictLine e. U.', language: 'EN', product: 'notion-ics' }
 	});
 	filtered.forEach((event) => {
+		const startDateText = event.date.start
+		const startDate = moment(new Date(startDateText))
+		const endDate = moment(new Date(event.date.end ?? event.date.start))
+		const allDay = startDateText.search(/\d{2}T\d{2}/i) < 0
+		// const timeZoneDifference = startDate.utcOffset() - endDate.utcOffset()
+		
+		if (allDay)
+			endDate.add(1, 'days') // end date is exclusive, so add 1 day
+		// else if (timeZoneDifference != 0) {
+		// 	endDate.add(timeZoneDifference, 'minutes')
+		// 	endDate.utcOffset(startDate.utcOffset())
+		// }
+
 		calendar.createEvent({
-			start: new Date(event.date.start),
-			end: new Date(Date.parse(event.date.end ?? event.date.start) + 86400000), // end date is exclusive, so add 1 day
-			allDay: true,
+			start: startDate,
+			end: endDate, 
+			allDay: allDay,
 			summary: event.title,
 			busystatus: calendarDefinition.busy
 		});
