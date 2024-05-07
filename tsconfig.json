@@ -3,6 +3,7 @@
 
 	"compilerOptions": {
 		"sourceMap": true,
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true
 	}
 }
