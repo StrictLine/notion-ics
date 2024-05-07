@@ -1,7 +1,7 @@
 import ical from 'ical-generator';
 import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 import config from '$lib/config';
 import type { RequestHandler } from './$types';
@@ -38,49 +38,42 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		databaseEntries.push(...query.results);
 	}
 
-	const filtered: {
-		title: string;
-		date: { start: string; end: string | null; time_zone: string | null };
-	}[] = databaseEntries.flatMap((dbEntry) => {
-		// console.log(dbEntry)
+	const filtered = databaseEntries.flatMap((dbEntry) => {
 		const dateProperty = dbEntry.properties[calendarDefinition.dateProperty];
-		// console.log(dateProperty)
+		const timezoneDiffProperty = calendarDefinition.timezoneDiffProperty in dbEntry.properties ?
+			dbEntry.properties[calendarDefinition.timezoneDiffProperty]
+			: null;
 
+		const titleContent = dbEntry.properties[calendarDefinition.titleProperty].title[0].text.content;
+		let dateValue = null;
+		
 		switch (dateProperty.type) {
-			case 'formula': {
+			case 'formula':
 				if (dateProperty.formula.type !== 'date') {
 					return [];
 				}
 
-				const dateValue = dateProperty.formula.date;
-				if (dateValue === null) {
-					return [];
-				}
-				
-				return [
-					{
-						title: dbEntry.properties[calendarDefinition.titleProperty].title[0].text.content,
-						date: dateValue
-					}
-				];
-			}
+				dateValue = dateProperty.formula.date;
+			break;
 
 			case 'date':
-				if (dateProperty.date === null) {
-					return [];
-				}
+				dateValue = dateProperty.date
+			break;
 
-				return [
-					{
-						title: dbEntry.properties[calendarDefinition.titleProperty].title[0].text.content,
-						date: dbEntry.properties[calendarDefinition.dateProperty].date
-					}
-				];						
-		
 			default:
 				break;
 		}
 
+		if (dateValue === null)
+			return [];
+		
+		return [
+			{
+				title: titleContent,
+				date: dateValue,
+				timezoneDiff: timezoneDiffProperty?.formula.number ?? 0
+			}
+		];
 	});
 
 	if (!('title' in databaseMetadata))
@@ -95,23 +88,24 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		name: ((databaseMetadata as DatabaseObjectResponse).title[0] as TextRichTextItemResponse).text.content,
 		prodId: { company: 'StrictLine e. U.', language: 'EN', product: 'notion-ics' }
 	});
+
+	const timezone = moment.tz.guess();
+
 	filtered.forEach((event) => {
 		const startDateText = event.date.start
 		const startDate = moment(new Date(startDateText))
 		const endDate = moment(new Date(event.date.end ?? event.date.start))
+			.subtract(event.timezoneDiff, 'hour')
+
 		const allDay = startDateText.search(/\d{2}T\d{2}/i) < 0
-		// const timeZoneDifference = startDate.utcOffset() - endDate.utcOffset()
 		
 		if (allDay)
 			endDate.add(1, 'days') // end date is exclusive, so add 1 day
-		// else if (timeZoneDifference != 0) {
-		// 	endDate.add(timeZoneDifference, 'minutes')
-		// 	endDate.utcOffset(startDate.utcOffset())
-		// }
 
 		calendar.createEvent({
 			start: startDate,
 			end: endDate, 
+			timezone: timezone,
 			allDay: allDay,
 			summary: event.title,
 			busystatus: calendarDefinition.busy
