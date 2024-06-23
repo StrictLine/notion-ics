@@ -1,6 +1,6 @@
 import ical from 'ical-generator';
 import { Client } from '@notionhq/client';
-import type { DatabaseObjectResponse, QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 import moment from 'moment-timezone';
 
 import config from '$lib/config';
@@ -85,7 +85,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		});
 
 	const calendar = ical({
-		name: ((databaseMetadata as DatabaseObjectResponse).title[0] as TextRichTextItemResponse).text.content,
+		name: (databaseMetadata.title[0] as TextRichTextItemResponse)?.text.content,
 		prodId: { company: 'StrictLine e. U.', language: 'EN', product: 'notion-ics' }
 	});
 
