@@ -84,8 +84,10 @@ export const GET: RequestHandler = async ({ params, url }) => {
 			}
 		});
 
+	const title = databaseMetadata.title[0] as TextRichTextItemResponse;
+	const name = title?.text ? title.text.content : 'Untitled Calendar';
 	const calendar = ical({
-		name: (databaseMetadata.title[0] as TextRichTextItemResponse)?.text.content,
+		name: name,
 		prodId: { company: 'StrictLine e. U.', language: 'EN', product: 'notion-ics' }
 	});
 
