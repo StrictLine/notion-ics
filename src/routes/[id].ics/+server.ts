@@ -44,7 +44,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
 			dbEntry.properties[calendarDefinition.timezoneDiffProperty]
 			: null;
 
-		const titleContent = dbEntry.properties[calendarDefinition.titleProperty].title[0].text.content;
+		const titlePropertyValue = dbEntry.properties[calendarDefinition.titleProperty];
+		if (!titlePropertyValue.title || titlePropertyValue.title.length < 1)
+			return [];
+
+		const titleContent = titlePropertyValue.title[0].text.content;
 		let dateValue = null;
 		
 		switch (dateProperty.type) {
