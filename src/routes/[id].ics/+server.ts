@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		databaseEntries.push(...query.results);
 	}
 
-	const filtered = databaseEntries.flatMap((dbEntry) => {
+	const filteredDBEntries = databaseEntries.flatMap((dbEntry) => {
 		const dateProperty = dbEntry.properties[calendarDefinition.dateProperty];
 		const timezoneDiffProperty = calendarDefinition.timezoneDiffProperty in dbEntry.properties ?
 			dbEntry.properties[calendarDefinition.timezoneDiffProperty]
@@ -71,9 +71,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		if (dateValue === null)
 			return [];
 		
+		const url = dbEntry.url
+
 		return [
 			{
 				title: titleContent,
+				url: url,
 				date: dateValue,
 				timezoneDiff: timezoneDiffProperty?.formula.number ?? 0
 			}
@@ -89,15 +92,15 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		});
 
 	const title = databaseMetadata.title[0] as TextRichTextItemResponse;
-	const name = title?.text ? title.text.content : 'Untitled Calendar';
+	const name:string = title?.text ? title.text.content : 'Untitled Calendar';
 	const calendar = ical({
-		name: name,
+		name: name.trim(),
 		prodId: { company: 'StrictLine e. U.', language: 'EN', product: 'notion-ics' }
 	});
 
 	const timezone = moment.tz.guess();
 
-	filtered.forEach((event) => {
+	filteredDBEntries.forEach((event) => {
 		const startDateText = event.date.start
 		const startDate = moment(new Date(startDateText))
 		const endDate = moment(new Date(event.date.end ?? event.date.start))
@@ -114,6 +117,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 			timezone: timezone,
 			allDay: allDay,
 			summary: event.title,
+			description: event.url,
 			busystatus: calendarDefinition.busy
 		});
 	});
