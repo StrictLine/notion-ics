@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 	while (query.has_more) {
 		query = await notion.databases.query({
 			database_id: id,
-			page_size: 100,
+			page_size: 1000,
 			start_cursor: query.next_cursor,
 			filter: calendarDefinition.filter
 		});
