@@ -6,6 +6,7 @@ type CalendarQueryDefinition = {
 	dateProperty: Readonly<string>;
 	titleProperty: Readonly<string>;
 	busy: Readonly<ICalEventBusyStatus>;
+	timezoneDiffProperty?: Readonly<string>;
 };
 
 export default {
