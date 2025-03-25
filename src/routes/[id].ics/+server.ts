@@ -11,7 +11,7 @@ export const trailingSlash = 'never';
 
 const notion = new Client({ auth: NOTION_TOKEN });
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params, url }) => {	
 	const secret = url.searchParams.get('secret');
 	if (secret !== ACCESS_KEY) {
 		return new Response('Forbidden', { status: 403 });
@@ -48,7 +48,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		if (!titlePropertyValue.title || titlePropertyValue.title.length < 1)
 			return [];
 
-		const titleContent = titlePropertyValue.title[0].text.content;
+		const titleContent = titlePropertyValue.title.map(item => item.text.content).join('');
 		let dateValue = null;
 		
 		switch (dateProperty.type) {
