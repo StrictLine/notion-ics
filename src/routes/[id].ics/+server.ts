@@ -1,6 +1,6 @@
 import ical from 'ical-generator';
 import { Client } from '@notionhq/client';
-import type { QueryDatabaseResponse, TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { TextRichTextItemResponse } from '@notionhq/client';
 import moment from 'moment-timezone';
 
 import config from '$lib/config';
@@ -23,12 +23,24 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
 	const databaseMetadata = await notion.databases.retrieve({ database_id: id });
 
-	const databaseEntries = [];
-	let query: QueryDatabaseResponse | { has_more: true; next_cursor: undefined } = {
-		has_more: true,
-		next_cursor: undefined
+	// Define a type for the database query response
+	type NotionDatabaseQueryResponse = {
+		has_more: boolean;
+		next_cursor: string | null | undefined;
+		results: Array<Record<string, unknown>>;
 	};
+
+	const databaseEntries = [];
+	let query: NotionDatabaseQueryResponse = {
+		has_more: true,
+		next_cursor: undefined,
+		results: []
+	};
+	
 	while (query.has_more) {
+		// The Notion SDK doesn't export the query type, but we know the response shape
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore: The Notion client doesn't export proper types for database query
 		query = await notion.databases.query({
 			database_id: id,
 			page_size: 1000,
