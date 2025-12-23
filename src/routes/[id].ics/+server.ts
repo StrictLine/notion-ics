@@ -41,8 +41,8 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		// The Notion SDK doesn't export the query type, but we know the response shape
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore: The Notion client doesn't export proper types for database query
-		query = await notion.databases.query({
-			database_id: id,
+		query = await notion.dataSources.query({
+			data_source_id: id,
 			page_size: 1000,
 			start_cursor: query.next_cursor,
 			filter: calendarDefinition.filter
