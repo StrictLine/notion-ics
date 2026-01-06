@@ -5,6 +5,9 @@ const config = {
 	plugins: [sveltekit()],
 	optimizeDeps: {
 		exclude: ['moment']
+	},
+	preview: {
+		allowedHosts: ['apps.strictline.at']
 	}
 };
 
