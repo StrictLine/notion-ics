@@ -17,10 +17,11 @@
 				"dev"
 			],
 			"runtimeExecutable": "npm",
+			// "smartStep": true,
 			"skipFiles": [
-				"<node_internals>/**"
+				"<node_internals>/**",
 			],
-			"type": "node"
+			"type": "node",
 		},
 		
 		{

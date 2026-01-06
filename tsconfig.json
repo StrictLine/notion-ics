@@ -3,7 +3,11 @@
 
 	"compilerOptions": {
 		"sourceMap": true,
+		"sourceRoot": "./src",
 		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"moduleResolution": "node"
 	}
 }
