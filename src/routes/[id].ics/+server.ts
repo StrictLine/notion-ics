@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
 const { ACCESS_KEY, NOTION_TOKEN } = process.env;
 export const trailingSlash = 'never';
 
-const notion = new Client({ auth: NOTION_TOKEN });
+const notion = new Client({ auth: NOTION_TOKEN, notionVersion: '2025-09-03' });
 
 export const GET: RequestHandler = async ({ params, url }) => {	
 	const secret = url.searchParams.get('secret');
@@ -36,13 +36,17 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		next_cursor: undefined,
 		results: []
 	};
+
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore: The Notion client doesn't export proper types for this type
+	const dataSourceId = (databaseMetadata as unknown).data_sources[0].id;
 	
 	while (query.has_more) {
 		// The Notion SDK doesn't export the query type, but we know the response shape
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore: The Notion client doesn't export proper types for database query
 		query = await notion.dataSources.query({
-			data_source_id: id,
+			data_source_id: dataSourceId,
 			page_size: 1000,
 			start_cursor: query.next_cursor,
 			filter: calendarDefinition.filter
@@ -60,7 +64,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 		if (!titlePropertyValue.title || titlePropertyValue.title.length < 1)
 			return [];
 
-		const titleContent = titlePropertyValue.title.map(item => item.text.content).join('');
+		const titleContent = titlePropertyValue.title.map(item => item.text?.content ?? item.plain_text).join('');
 		let dateValue = null;
 		
 		switch (dateProperty.type) {
